@@ -1,0 +1,22 @@
+{
+  "model": "claude-haiku-4-5",
+  "max_tokens": 500,
+  "system": "SYSTEM_PROMPT_WITH_DATE",
+  "messages": [{ "role": "user", "content": "DICTATED_TEXT" }],
+  "output_config": {
+    "format": {
+      "type": "json_schema",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string" },
+          "project": { "type": "string", "enum": ["🧭 Nava", "🤖 CourtChat", "🏠 Home", "🐺 UW", "🧠 Civic Insights", "💡 Projects", "🏘️ Compound"] },
+          "due": { "type": "string" },
+          "summary": { "type": "string" }
+        },
+        "required": ["title", "project", "due", "summary"],
+        "additionalProperties": false
+      }
+    }
+  }
+}
