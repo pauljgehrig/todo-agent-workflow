@@ -6,7 +6,8 @@ iCloud automatically. Total build time: ~20 minutes.
 
 **What it does:** dictate → Claude cleans + categorizes (~1s) → you confirm or
 edit the title → item lands in ✅ To do, filed and tagged `Agent: new`. If the
-Claude call ever fails, the raw dictation is saved to Notion anyway.
+Claude call fails, the shortcut errors visibly and saves nothing (by design —
+the board stays 100% clean); re-dictate later.
 
 ---
 
@@ -106,17 +107,10 @@ you have several, and a mis-picked pill fails silently.
        - Request Body: **File** → [NotionBody]
     g. **Show Notification**: `Added: [FinalTitle] → [Project]`
 
-13. **Otherwise** (Claude call failed — fallback):
-
-    a. **Text** action → **FallbackBody**:
-
-```
-{"parent":{"type":"data_source_id","data_source_id":"738b360f-dcb0-4388-80d6-df62ba0a9e00"},"properties":{"Task name":{"title":[{"text":{"content":"INSERT_CLEANDICTATION"}}]},"Status":{"status":{"name":"to do"}},"Agent":{"select":{"name":"new"}},"Assignee":{"people":[{"id":"55e82040-9178-4fe9-844b-1cf2aeda8db1"}]}}}
-```
-
-    (insert [CleanDictation] where marked)
-    b. **Get Contents of URL** — identical to step 12f but body [FallbackBody].
-    c. **Show Notification**: `Saved raw (cleanup queued): [CleanDictation]`
+13. **Otherwise**: leave empty. **Design decision (2026-08-09):** there is
+    no fallback save. If the Claude call fails, the shortcut errors visibly
+    and nothing is written to Notion — the board stays 100% clean and
+    categorized. Re-dictate when the API is back.
 
 14. **End If**.
 
@@ -130,8 +124,8 @@ you have several, and a mis-picked pill fails silently.
 
 ## Warnings
 
-- **Never reorder the If/Otherwise branches** when editing later — the
-  Otherwise branch is the never-lose-a-capture fallback.
+- **Keep the If/Otherwise structure intact** when editing later — the happy
+  path lives inside the If branch.
 - The two secret Text actions live only in this Shortcut (iCloud-synced).
   If you ever share the Shortcut, delete the secrets first.
 - If a JSON body errors: the usual cause is a straight quote (`"`) typed into
@@ -153,7 +147,6 @@ stage to inspect output, delete them when done.
 | C | step 11 | Title, Project, Due | clean title; 🏠 Home; tomorrow's date |
 | D | step 12a | — | editable confirm with title pre-filled |
 | E | step 12f | URL response | JSON with `"object":"page"` and an `"id"` (a `"message"` = body validation error) |
-| F | fallback branch | — | "Saved raw" notification with broken key |
 
 ## Test checklist (after building)
 
@@ -161,5 +154,5 @@ stage to inspect output, delete them when done.
    → expect confirm prompt "Filed under 🏠 Home", then a Notion item with
    tomorrow's due date and Agent = new.
 2. Break the Anthropic key (add an `x` in the AnthropicKey Text action), run
-   again with any phrase → expect "Saved raw" notification and a raw item in
-   Notion. Fix the key afterward.
+   again with any phrase → expect a visible error and NO new Notion item
+   (no-fallback design). Fix the key afterward.

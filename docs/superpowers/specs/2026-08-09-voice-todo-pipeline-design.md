@@ -3,6 +3,11 @@
 **Date:** 2026-08-09
 **Status:** Approved in brainstorming session; ready for implementation planning
 
+> **Amendment (2026-08-09, during build):** the raw-dump fallback path was
+> removed at Paul's request. If the Claude capture call fails, the Shortcut
+> errors visibly and saves nothing — keeping the board 100% clean/categorized
+> and the sweep free of cleanup work. Re-dictate when the API is back.
+
 ## Purpose
 
 Dictate a to-do from the phone by voice, have it land clean and correctly
