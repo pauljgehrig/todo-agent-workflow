@@ -40,9 +40,10 @@ Query for work:
   If Paul has replied below the questions, resume processing with his answer;
   otherwise skip.
 
-## 2. Clean up (raw-fallback items only)
+## 2. Clean up (unfiled items only)
 
-An item with no `Project` came through the Shortcut's fallback path. Rewrite
+The Shortcut always files items, so an `Agent = new` item with no `Project`
+was created by hand in Notion and opted into the pipeline. Rewrite
 the title (imperative, ~70 chars, fix dictation artifacts), pick the Project
 (options: 🧭 Nava, 🤖 CourtChat, 🏠 Home, 🐺 UW, 🧠 Civic Insights,
 💡 Projects, 🏘️ Compound), parse any spoken due date, and PATCH the page
