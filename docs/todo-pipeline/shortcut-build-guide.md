@@ -58,26 +58,39 @@ typing the magic-variable name.
 
 ### Part 3 — parse & confirm
 
+**Naming rule (learned the hard way):** after every action whose output is
+used anywhere other than the directly-following action, add a **Set Variable**
+with an explicit name. Shortcuts' unnamed "magic variable" pills (Dictionary
+Value, Text, Updated Text…) are indistinguishable in the variable picker once
+you have several, and a mis-picked pill fails silently.
+
 8. **Get Dictionary from Input** on [ClaudeResponse].
-9. **Get Dictionary Value**: key `content` → **Get Item from List**: First Item
-   → **Get Dictionary Value**: key `text`. Output: **ResultJSON**.
-10. **Get Dictionary from Input** on [ResultJSON]. Output: **Result**.
-11. **Get Dictionary Value** key `title` from [Result] → rename **Title**.
-    Repeat for `project` → **Project**, `due` → **Due**, `summary` → **Summary**.
-12. **If** [Title] *has any value*:   ← everything until "Otherwise" goes inside
+9. **Get Dictionary Value**: key `content.1.text` (a dot-path: key `content`,
+   item 1, key `text` — one action instead of three), Dictionary: leave the
+   grayed auto-input. → **Set Variable** `ResultJSON`.
+10. **Get Dictionary from Input** on [ResultJSON]. → **Set Variable** `Result`.
+11. Four Get/Set pairs, each Get pulling from [Result] by name:
+    - **Get Dictionary Value** key `title` → **Set Variable** `vTitle`
+    - **Get Dictionary Value** key `project` → **Set Variable** `vProject`
+    - **Get Dictionary Value** key `due` → **Set Variable** `vDue`
+    - **Get Dictionary Value** key `summary` → **Set Variable** `vSummary`
+12. **If** [vTitle] *has any value*:   ← everything until "Otherwise" goes inside
 
     a. **Ask for Input** (Input Type: Text):
-       - Prompt: `Filed under [Project]:` (insert the Project variable)
-       - Default Answer: [Title]
+       - Prompt: `Filed under [vProject]:` (insert the vProject variable)
+       - Default Answer: [vTitle]
        This is the editable confirm — Siri speaks the prompt; edit by keyboard
        or tap Done. Output: **FinalTitle**.
-    b. **Replace Text**: find `"` replace `'` in [FinalTitle] → **SafeTitle**.
-    c. **Replace Text**: find `"` replace `'` in [Summary] → **SafeSummary**.
-    d. **If** [Due] *has any value* (nested if):
-       - **Text**: `{"start":"INSERT_DUE"}` with [Due] inserted → **DueJSON**
-       - **Otherwise** → **Text**: `null` → **DueJSON**
-       - **End If** (use the same variable name in both branches)
-    e. **Text** action — paste, then insert variables where marked.
+    b. **Replace Text**: find `"` replace `'` in [FinalTitle] → **Set Variable** `SafeTitle`.
+    c. **Replace Text**: find `"` replace `'` in [vSummary] → **Set Variable** `SafeSummary`.
+    d. **If** [vDue] *has any value* (nested if):
+       - **Text**: `{"start":"INSERT_DUE"}` with [vDue] inserted → **Set Variable** `DueJSON`
+       - **Otherwise** → **Text**: `null` → **Set Variable** `DueJSON`
+       - **End If** (same variable name in both branches)
+    e. **Text** action — paste, then insert the named variables where marked:
+       `INSERT_SAFETITLE` → [SafeTitle], `INSERT_PROJECT` → [vProject],
+       `INSERT_SAFESUMMARY` → [SafeSummary], `INSERT_DUEJSON` → [DueJSON]
+       (DueJSON deliberately has no quotes around it in the template).
        Rename: **NotionBody**.
 
 ```
