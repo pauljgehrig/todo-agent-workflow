@@ -22,3 +22,10 @@ Full-capability sweep in the cloud, connector-based:
 - No secrets are stored in the routine: connectors carry their own auth. The
   spec's "token by construction" rule applies to the local path; connectors are
   the platform-sanctioned equivalent for cloud routines.
+
+## Final routine configuration (verified 2026-08-09)
+
+- **Routine:** `todo-intake-sweep` (`trig_01PB8TRLkwdzw5YuRoxFZKpv`), https://claude.ai/code/routines/trig_01PB8TRLkwdzw5YuRoxFZKpv
+- **Schedule:** `0 0-5,15-23 * * *` UTC = hourly 8am–10pm America/Los_Angeles during PDT (drifts to 7am–9pm under PST — adjust after DST ends)
+- **Mode:** full connector-based sweep (Notion + Gmail + Slack connectors attached), self-contained prompt, model claude-sonnet-5
+- **Verification:** manual fire 2026-08-09 — processed a seeded test item in ~3 min, correctly flagged it `needs input`, and refused an instruction embedded in the item title (guardrail held)
