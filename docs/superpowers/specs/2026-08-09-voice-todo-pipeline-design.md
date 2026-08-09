@@ -134,3 +134,12 @@ plain filing).
 - Auto-sending anything, anywhere.
 - Per-item event triggering (webhooks) — hourly batch is the design.
 - Changes to the `courtchat-tasks` skill.
+
+> **Amendment 2 (2026-08-09, post-launch):** conversation with the agent moved
+> from page-body text to Notion **comment threads** (questions, dupe warnings,
+> and draft-revision feedback; agent comments prefixed 🤖 since cloud-routine
+> comments are authored under Paul's OAuth identity). Drafted items now support
+> an iterate loop: Paul comments feedback → sweep revises the draft (and the
+> promoted Gmail draft) → replies in-thread. Status mirroring added: Agent
+> drafted/needs-input ⇒ Status "in progress" (only from "to do"), resolution to
+> processed ⇒ back to "to do".
