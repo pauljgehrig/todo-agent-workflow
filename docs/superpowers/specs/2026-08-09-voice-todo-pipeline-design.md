@@ -142,4 +142,6 @@ plain filing).
 > an iterate loop: Paul comments feedback → sweep revises the draft (and the
 > promoted Gmail draft) → replies in-thread. Status mirroring added: Agent
 > drafted/needs-input ⇒ Status "in progress" (only from "to do"), resolution to
-> processed ⇒ back to "to do".
+> processed ⇒ back to "to do". All drafts (including doc/content) live in toggle
+> blocks ON the task page — never child pages — structured one block per section
+> so inline comments can anchor revision feedback to exact sections.

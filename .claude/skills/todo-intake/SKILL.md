@@ -28,7 +28,7 @@ Data source ID: `738b360f-dcb0-4388-80d6-df62ba0a9e00`. API version header:
 
 ## Communication protocol: comments, not body text
 
-The page BODY holds only work product (draft toggles, child pages, context).
+The page BODY holds only work product (draft toggles, context blocks).
 All conversation with Paul happens in the page's COMMENT thread:
 
 - Questions (ambiguous items), dupe warnings, and "here's what I did" notices
@@ -107,8 +107,11 @@ links) to the page body. No history found = no block; don't pad.
   available in this session, also create a real Gmail draft (recipient blank
   unless the address is certain) and note it in the toggle. If not, note
   "not yet promoted" — the next capable run promotes it.
-- **Doc/content** ("write up/draft/outline/plan X"): draft the content as a
-  child page of the task titled "Draft: <topic>".
+- **Doc/content** ("write up/draft/outline/plan X"): draft the content
+  inside a toggle block "📄 Draft: <topic>" ON THE TASK PAGE — never a child
+  page or separate document. Structure the toggle's children as real blocks
+  (headings, bullets, paragraphs), one block per section, so Paul can anchor
+  an inline comment on exactly the section that needs revision.
 - **Research** ("look into/compare/find out X"): do web research; append a
   toggle block "🔎 Research findings" with a short summary and source links.
 - **Slack** ("tell/ask/ping <person> on Slack about X"): write the message
@@ -118,10 +121,15 @@ links) to the page body. No history found = no block; don't pad.
 
 ### 5b. Drafted items with Paul feedback (newest comment lacks 🤖)
 
-Revise the draft per his comment: update the toggle text / child page, and if
-a Gmail draft was promoted, update it too (update_draft) so both copies match.
-Reply in-thread: "🤖 Revised — <one line on what changed>." Item stays
-`drafted`. Iterate as many rounds as Paul wants.
+Feedback can be page-level OR anchored to a specific block inside the draft
+toggle. For each drafted item with possible feedback: fetch the page's blocks
+(including toggle children) and check comments per block
+(`GET /v1/comments?block_id=<block_id>`) as well as the page-level thread.
+Revise exactly what the comment targets — a block-anchored comment means
+rewrite that section (PATCH the block); a page-level comment applies to the
+whole draft. If a Gmail draft was promoted, update it too (update_draft) so
+both copies match. Reply in the same thread: "🤖 Revised — <one line on what
+changed>." Item stays `drafted`. Iterate as many rounds as Paul wants.
 
 ### 5c. Promotion pass
 
