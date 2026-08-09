@@ -1,0 +1,20 @@
+TODO PIPELINE — MANUAL SETUP STEPS (Task 1)
+
+1. Notion integration
+   - https://www.notion.so/profile/integrations -> New integration
+   - Name: todo-intake | Workspace: Paul's Notion | Type: Internal
+   - Capabilities: Read content, Update content, Insert content
+   - Save, copy the secret (ntn_...)
+   - Open the "✅ To do" database page in Notion -> ••• menu -> Connections -> add "todo-intake"
+
+2. Anthropic API key
+   - https://platform.claude.com/settings/keys
+   - Create key named: todo-shortcut
+   - Copy the key (sk-ant-...)
+
+3. Give both values to Claude in the session, or write them yourself:
+   mkdir -p ~/.config/todo-intake
+   Create ~/.config/todo-intake/env containing:
+     NOTION_TOKEN=ntn_PASTE_HERE
+     ANTHROPIC_API_KEY=sk-ant-PASTE_HERE
+   chmod 600 ~/.config/todo-intake/env
