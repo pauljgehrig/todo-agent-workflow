@@ -126,6 +126,22 @@ typing the magic-variable name.
   Settings → General → Keyboard → Smart Punctuation on iPhone, or paste from
   this file rather than typing.
 
+## Incremental testing (build a part, test it, continue)
+
+Two tricks: (1) while building, replace **Dictate Text** with a plain **Text**
+action holding `pick up the dry cleaning tomorrow` — no re-dictating on every
+run; swap Dictate back at the end. (2) add a **Show Result** action after each
+stage to inspect output, delete them when done.
+
+| Checkpoint | After | Show Result on | Expect |
+|---|---|---|---|
+| A | Part 1 (steps 1–5) | CleanDictation, Today | your phrase; today's date |
+| B | step 7 | ClaudeResponse | JSON containing `"content":[{"type":"text"...` (an `"error"` key = bad key/header) |
+| C | step 11 | Title, Project, Due | clean title; 🏠 Home; tomorrow's date |
+| D | step 12a | — | editable confirm with title pre-filled |
+| E | step 12f | URL response | JSON with `"object":"page"` and an `"id"` (a `"message"` = body validation error) |
+| F | fallback branch | — | "Saved raw" notification with broken key |
+
 ## Test checklist (after building)
 
 1. Run "Hey Siri, add to-do" → dictate *"pick up the dry cleaning tomorrow"*
