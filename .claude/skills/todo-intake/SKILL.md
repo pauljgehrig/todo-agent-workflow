@@ -122,9 +122,19 @@ links) to the page body. No history found = no block; don't pad.
 ### 5b. Drafted items with Paul feedback (newest comment lacks 🤖)
 
 Feedback can be page-level OR anchored to a specific block inside the draft
-toggle. For each drafted item with possible feedback: fetch the page's blocks
-(including toggle children) and check comments per block
-(`GET /v1/comments?block_id=<block_id>`) as well as the page-level thread.
+toggle. For each drafted item: fetch the page's blocks AND each toggle's
+children, then check comments per block. Use this exact scan (a subtly broken
+loop here silently hides feedback — this pattern is verified):
+
+    for B in $(curl -s "https://api.notion.com/v1/blocks/<page_id>/children?page_size=100" "${H[@]}" | jq -r '.results[].id'); do
+      for K in $B $(curl -s "https://api.notion.com/v1/blocks/$B/children?page_size=100" "${H[@]}" | jq -r '.results[]?.id // empty'); do
+        curl -s "https://api.notion.com/v1/comments?block_id=$K" "${H[@]}" \
+          | jq -r --arg b "$K" '.results[] | $b + " | " + .discussion_id + " | " + (.rich_text | map(.plain_text) | join(""))'
+      done
+    done
+
+Reply in the SAME thread by posting with that `discussion_id`
+(`POST /v1/comments` with `{"discussion_id": ..., "rich_text": [...]}`).
 Revise exactly what the comment targets — a block-anchored comment means
 rewrite that section (PATCH the block); a page-level comment applies to the
 whole draft. If a Gmail draft was promoted, update it too (update_draft) so
