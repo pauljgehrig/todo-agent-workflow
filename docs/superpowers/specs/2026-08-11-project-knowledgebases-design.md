@@ -20,8 +20,10 @@ the same Notion database.
 - `paulgehrig/emmy-project-context` is a **private** GitHub repo — not
   fetchable from the cloud routine without embedding a token, which the
   pipeline design forbids.
-- `~/Emmy` is the canonical Emmy KB and must stay canonical — nothing in this
-  design makes Notion a competing source of truth for Emmy.
+- The shared repo clone `~/code/emmy-project-context` is the canonical
+  published Emmy KB (per `/update` Phase 2; the local `~/Emmy` vault is
+  intentionally not kept in sync with it). Nothing in this design makes
+  Notion a competing source of truth for Emmy.
 
 ## Decision
 
@@ -48,9 +50,10 @@ Every KB page has:
    - `agent-owned` (Compound): the todo agent maintains it. When a task
      resolves with a durable fact ("vanity ordered, arriving ~Sept",
      "contractor X handles electrical"), the agent updates the digest.
-   - `mirrored` (Emmy): read-only copy of `~/Emmy` domain toplines, refreshed
-     by a sync script. **The todo agent never edits a mirrored digest** —
-     edits would be clobbered on the next sync.
+   - `mirrored` (Emmy): read-only copy of the shared-repo domain toplines
+     (`~/code/emmy-project-context/domains/_*.md`), refreshed by a sync
+     script. **The todo agent never edits a mirrored digest** — edits would
+     be clobbered on the next sync.
 2. **Activity log zone** — agent-appended on every KB-relevant task, both
    types: one line per filed/iterated task, newest first
    (`2026-08-11 — drafted email to plumber re: quote, <link>`). Trimmed to
@@ -58,20 +61,21 @@ Every KB page has:
    sweep reads it and knows what's already in flight.
 
 For mirrored KBs the activity log is also the bridge back to the source of
-truth: the Friday `/update` loop harvests durable items from it into `~/Emmy`,
-then re-syncs the digest.
+truth: the Friday `/update` loop harvests durable items from it as candidate
+contributions through the existing Phase 2 contribute → distill flow in
+`~/code/emmy-project-context`, then re-syncs the digest.
 
 ### Emmy digest structure (token-cost control)
 
-The sync script pushes:
+The sync script pushes, from `~/code/emmy-project-context`:
 
-- **Top level:** the START-HERE "What's new" table (~700 tokens).
-- **Six toggles**, one per domain, each holding that domain's `_domain.md`
-  topline content.
+- **Top level:** the repo's `START-HERE.md` topline (~700 tokens).
+- **Six toggles**, one per domain (product, policy, research, design,
+  engineering, states), each holding that domain's `domains/_*.md` content.
 
-Read rule for the agent: always read the What's new table when processing a
-Nava task; expand a domain toggle only when the task plausibly touches that
-domain. Full digest is ~11k tokens; a typical selective read is 1–3k.
+Read rule for the agent: always read the topline when processing a Nava
+task; expand a domain toggle only when the task plausibly touches that
+domain. Full digest is ~16k tokens; a typical selective read is 1–4k.
 Notion's API returns block children on demand, so toggles are the
 pay-for-what-you-read boundary.
 
@@ -93,9 +97,10 @@ only when the sweep actually contains a task whose project has a KB row.
 
 ## `/update` skill changes
 
-One added step: read the Emmy KB activity log in Notion, harvest anything
-durable into `~/Emmy` (normal KB contribution flow), then run the digest sync
-script so the mirror reflects the updated toplines.
+One added step in Phase 2: read the Emmy KB activity log in Notion, surface
+anything durable as candidate contributions (existing contribute → distill
+flow in the shared repo), then run the digest sync script so the mirror
+reflects the updated toplines.
 
 ## Setup (one-time)
 
@@ -105,7 +110,8 @@ script so the mirror reflects the updated toplines.
    mining past Claude Code sessions** for renovation/house discussions; Paul
    reviews the seed before it goes live.
 3. Create the Emmy KB digest page; write the sync script (lives in
-   `~/Emmy/scripts/`), wire it into the Friday `/update` skill; run it once.
+   `scripts/` in this repo), wire it into the Friday `/update` skill; run it
+   once.
 
 ## Out of scope (YAGNI)
 
@@ -119,7 +125,7 @@ script so the mirror reflects the updated toplines.
 
 - Seed a test Compound item; verify the sweep reads the Compound KB, uses it
   in the draft, and appends an activity-log line.
-- Seed a test Nava item; verify selective toggle reading (What's new + one
+- Seed a test Nava item; verify selective toggle reading (topline + one
   domain) and that the mirrored digest is untouched afterward.
 - Run the digest sync twice; verify idempotence (no duplicate blocks).
 - Verify an item whose project has no KB row processes exactly as before.
