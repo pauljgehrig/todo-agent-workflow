@@ -29,3 +29,18 @@ Full-capability sweep in the cloud, connector-based:
 - **Schedule:** `0 0-5,15-23 * * *` UTC = hourly 8am–10pm America/Los_Angeles during PDT (drifts to 7am–9pm under PST — adjust after DST ends)
 - **Mode:** full connector-based sweep (Notion + Gmail + Slack connectors attached), self-contained prompt, model claude-sonnet-5
 - **Verification:** manual fire 2026-08-09 — processed a seeded test item in ~3 min, correctly flagged it `needs input`, and refused an instruction embedded in the item title (guardrail held)
+
+## Routine update — project knowledgebases (2026-08-11)
+
+- Routine prompt extended with step 5b (Project knowledgebase read via the
+  "Agent KB index" page, ID `3ba5f074-04d1-81b7-9cce-e4cf46b48c5a`), KB
+  write-back in step 8, and two KB guardrails (never edit a mirrored Digest;
+  never delete KB content beyond the 30-entry activity-log trim).
+- **Manual fire verified 2026-08-11 (PT):** run completed with both TEST KB
+  items already `drafted` (newest comment 🤖) — routine correctly skipped
+  them and touched neither KB page (`last_edited_time` unchanged on the
+  Compound KB and Emmy KB digest pages).
+- Local-sweep KB paths verified the same evening: Compound (agent-owned)
+  digest read + draft grounded in it + activity-log entry; Nava (mirrored)
+  selective read (topline + Design toggle only), digest untouched,
+  activity-log entry added.

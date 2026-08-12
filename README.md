@@ -11,9 +11,13 @@ iOS home-screen widget for a live sneak peek of the list.
    resolve a due date, and write a one-line summary. The result is confirmed via an
    editable prompt, then written to the Notion "To do" database with `Agent = new`.
 2. **Process** — the `todo-intake` skill (and an hourly cloud routine) sweeps
-   `Agent = new` items: de-dupes, enriches with context, and — by task shape — drafts
-   first passes (email / doc / Slack / research). Conversation happens in Notion
-   comment threads; drafts iterate via a comment-driven revision loop.
+   `Agent = new` items: de-dupes, enriches with context, pulls the project's
+   knowledgebase (Notion pages mapped by the "Agent KB index"; Compound KB is
+   agent-maintained, the Emmy KB digest mirrors the shared
+   `emmy-project-context` repo), and — by task shape — drafts first passes
+   (email / doc / Slack / research). Worked tasks append to the KB's activity
+   log. Conversation happens in Notion comment threads; drafts iterate via a
+   comment-driven revision loop.
 3. **View** — a Scriptable iOS widget shows a sneak peek of open tasks, sorted by
    due date.
 
@@ -28,6 +32,8 @@ iOS home-screen widget for a live sneak peek of the list.
 | `docs/todo-pipeline/probe-results.md` | Cloud-routine capability probe results |
 | `docs/superpowers/specs/2026-08-09-voice-todo-pipeline-design.md` | Design spec |
 | `docs/superpowers/plans/2026-08-09-voice-todo-pipeline.md` | Implementation plan |
+| `scripts/sync-emmy-kb-digest.py` | Shared Emmy KB → Notion digest mirror (run by `/update`) |
+| `docs/superpowers/specs/2026-08-11-project-knowledgebases-design.md` | Per-project KB design spec |
 | `notion-todo-widget.js` | Scriptable iOS widget |
 | `todo-pipeline-setup-steps.txt` | Secrets + integration setup notes |
 
