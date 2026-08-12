@@ -25,6 +25,11 @@ Data source ID: `738b360f-dcb0-4388-80d6-df62ba0a9e00`. API version header:
 - NEVER overwrite a Status Paul set by hand — the only allowed transitions are
   `to do → in progress` (when taking an item) and `in progress → to do` (when
   handing it back), per Status mirroring below.
+- NEVER edit content under the "Digest" heading of a KB page whose Type in
+  the Agent KB index is `mirrored` — it is a synced mirror; edits get
+  clobbered and diverge from the source of truth.
+- NEVER delete KB page content, except trimming the Activity log to its 30
+  newest entries.
 
 ## Communication protocol: comments, not body text
 
@@ -97,6 +102,31 @@ anything relevant you know from memory/prior sessions. If something useful
 turns up, append a short "Context" paragraph block (2–3 sentences max, with
 links) to the page body. No history found = no block; don't pad.
 
+## 4b. Project knowledgebase
+
+The Agent KB index page (`$NOTION_KB_INDEX_PAGE_ID`, from the env file) maps
+Projects to KB pages. After the item's Project is known:
+
+1. `GET /v1/blocks/$NOTION_KB_INDEX_PAGE_ID/children`, find the `table`
+   block, `GET` its children, and match the item's Project against column 1
+   of each row. No matching row → skip this section entirely (the item
+   processes exactly as before).
+2. A matching row gives the KB page (page mention in column 2) and its Type
+   (column 3: `agent-owned` or `mirrored`). `GET` the KB page's children.
+   Every KB page has two `heading_1` sections: "Activity log" (newest
+   first), then "Digest".
+3. Read the Activity log entries (blocks between the two headings) — this
+   is what's already in flight for the project; use it to avoid duplicate
+   work and to connect the item to ongoing threads.
+4. Read the Digest selectively:
+   - `agent-owned`: read all digest blocks.
+   - `mirrored` (Emmy): always read the top-level paragraphs (the topline);
+     of the six domain toggles (Product / Policy / Research / Design /
+     Engineering / States), expand (`GET` children) ONLY the one or two
+     whose domain the task plausibly touches. Never read all six.
+5. Use what you learned in the Context block (step 4) and any drafting
+   (step 5).
+
 ## 5. Delegate (first-pass work)
 
 ### 5a. New items — match against these shapes; none fit = non-delegable.
@@ -155,6 +185,19 @@ Gmail/Slack draft object now if the connector is available, update the toggle.
 - Ambiguous item (can't categorize, or intent unclear): post a comment with
   1–2 short questions ("🤖 …?"), set `Agent` = `needs input`. Ask directly
   in chat too if Paul is in the session.
+- KB write-back (only if the project had a KB row in 4b AND this run
+  produced work — a draft, research findings, or a resolved thread):
+  1. Insert one activity-log line as a paragraph block directly after the
+     "Activity log" heading:
+     `PATCH /v1/blocks/<kb_page_id>/children` with
+     `{"after":"<activity_heading_block_id>","children":[<paragraph>]}` —
+     text: `YYYY-MM-DD — <one line on what was done> (<item title>, <url>)`.
+  2. Trim: if more than 30 entries now sit between the two headings, DELETE
+     the oldest blocks (the ones nearest the "Digest" heading).
+  3. `agent-owned` KBs only: if the task established a durable fact about
+     the project (a decision, a purchase, a contractor, a completed step),
+     update the matching Digest block (`PATCH` the block) or append a new
+     paragraph under "Digest". NEVER do this on a `mirrored` KB.
 - Only flip `Agent` after all of the item's processing succeeded — a crashed
   run must leave the item `new` so the next run retries it.
 
