@@ -1,7 +1,10 @@
 # To-Do Capture Endpoint — Design Spec
 
 **Date:** 2026-08-16
-**Status:** Approved shape; pending spec review → implementation plan
+**Status:** SHIPPED 2026-08-16 — deployed as Val `pauljgehrig/todo-capture`
+(`https://pjg-todo-capture.val.run`, routes `/parse` + `/save`); thin Shortcut
+rebuilt and verified end-to-end. See `endpoint/SHORTCUT.md` for the as-built flow
+and deploy gotchas.
 
 ## Problem
 
